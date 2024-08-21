@@ -26,3 +26,6 @@ yarn-error.log*
 /dist
 /workers-site
 wrangler.toml
+
+# deputy
+/src/deputy.wasm
