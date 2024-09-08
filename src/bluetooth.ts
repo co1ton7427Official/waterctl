@@ -66,7 +66,7 @@ async function handleBluetoothError(error: unknown) {
   output(dialogContent, error);
 
   dialogDebugContainer.style.display = "none";
-  if (isLogEmpty() && showLogs) {
+  if (!isLogEmpty() && showLogs) {
     dialogDebugContainer.style.display = "block";
     dialogDebugContent.innerText = "调试信息：\n" + getLogs().join("\n");
   }
