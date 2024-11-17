@@ -8,9 +8,7 @@ export function bufferToHexString(array: ArrayBuffer): string {
 
 export function decAsHex(n: number): number {
   // explanation: 42 => 0x42
-  let ret = 0;
-  for (let p = 0; n > 0; n = (n - (n % 10)) / 10) ret |= n % 10 << (p++ << 2);
-  return ret;
+  return n <= 0 ? 0 : n % 10 | (decAsHex((n / 10) | 0) << 4);
 }
 
 // だって思考と錯誤のモンスター
