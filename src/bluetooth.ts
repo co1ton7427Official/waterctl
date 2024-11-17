@@ -104,8 +104,9 @@ async function handleRxdNotifications(event: Event) {
           case 0x55: // key authentication ok; continue to send start epilogue (B2)
             await txdCharacteristic.writeValue(makeStartEpilogue(bluetoothDevice.name!, true));
             break;
-          case 0x01: // key authentication failed
-          case 0x04:
+          case 0x01: // key authentication failed; "err41" (bad key)
+          case 0x02: // ?
+          case 0x04: // "err43" (bad nonce)
             throw new Error("WATERCTL INTERNAL Bad key");
           default:
             await txdCharacteristic.writeValue(makeStartEpilogue(bluetoothDevice.name!, true));
