@@ -43,7 +43,7 @@ const errorCases: ErrorCase[] = [
     isHit: (msg) => !!msg.match(/User denied the browser permission/) || (isMobileDevice() && !!msg.match(/NotFoundError|Bluetooth adapter not available/)),
     output: (container) => {
       container.innerText = "未授予蓝牙权限。\n\n请前往手机设置，授予浏览器“附近设备”权限。\n详情请参考源代码仓库内的";
-      container.innerHTML += "<a href='https://github.com/celesWuff/waterctl/blob/gh-pages/FAQ.md' target='_blank'>“疑难解答”</a>。";
+      container.innerHTML += "<a href='https://github.com/celesWuff/waterctl/blob/2.x/FAQ.md' target='_blank'>“疑难解答”</a>。";
     },
     isFatal: true,
     showLogs: false,
@@ -52,7 +52,7 @@ const errorCases: ErrorCase[] = [
     isHit: (msg) => !isMobileDevice() && !!msg.match(/NotFoundError|Bluetooth adapter not available/),
     output: (container) => {
       container.innerText = "设备不支持蓝牙，或未授予蓝牙权限。\n\n详情请参考源代码仓库内的";
-      container.innerHTML += "<a href='https://github.com/celesWuff/waterctl/blob/gh-pages/FAQ.md' target='_blank'>“疑难解答”</a>。";
+      container.innerHTML += "<a href='https://github.com/celesWuff/waterctl/blob/2.x/FAQ.md' target='_blank'>“疑难解答”</a>。";
     },
     isFatal: true,
     showLogs: false,
