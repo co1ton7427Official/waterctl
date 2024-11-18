@@ -177,6 +177,16 @@
     (local $iD i32)
     (local $m i32)
 
+    (if (i32.and (i32.eq (local.get $b) (i32.const 255)) (i32.eq (i32.and (local.get $a) (i32.const 1)) (i32.const 1)))
+      (then
+        (local.set $a (i32.add (local.get $a) (i32.const 2)))
+      )
+    )
+    (if (i32.eq (local.get $a) (i32.const 257))
+      (then
+        (local.set $a (i32.const 0))
+      )
+    )
     (local.set $iA (i32.and (local.get $d) (i32.const 7)))
     (local.set $m (i32.and (local.get $d) (i32.xor (i32.const -1) (i32.const 7))))
     (if (i32.and (local.get $m) (i32.shl (i32.const 1) (i32.const 3)))
