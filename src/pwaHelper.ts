@@ -1,5 +1,5 @@
 export const registerServiceWorker = () => {
-  if (navigator.serviceWorker && !navigator.serviceWorker.controller) {
+  if (navigator.serviceWorker && !navigator.serviceWorker.controller && location.protocol === "https:") {
     navigator.serviceWorker.register("serviceworker.js");
   }
 };

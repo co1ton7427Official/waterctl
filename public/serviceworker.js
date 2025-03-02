@@ -2,7 +2,7 @@ const cacheName = 'files';
 
 addEventListener('fetch', fetchEvent => {
     const request = fetchEvent.request;
-    if (request.method !== 'GET') {
+    if (request.method !== 'GET' || !request.url.startsWith(self.location.origin)) {
         return;
     }
     fetchEvent.respondWith(async function () {
