@@ -21,6 +21,7 @@
     "wabt": "^1.0.36"
   },
   "dependencies": {
+    "@sentry/browser": "^9.3.0",
     "water.css": "^2.1.1"
   }
 }

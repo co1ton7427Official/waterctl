@@ -3,6 +3,11 @@ import "./styles.css";
 import "./writeValueLogging";
 import { handleButtonClick } from "./bluetooth";
 import { registerServiceWorker, resizeWindow, setupInstallButton } from "./pwaHelper";
+import * as Sentry from "@sentry/browser";
+
+Sentry.init({
+  dsn: "https://d07163d14d3078ebd0f9479584e00ced@o4508910681325568.ingest.de.sentry.io/4508910684143696",
+});
 
 (document.getElementById("version") as HTMLSpanElement).innerText = " · v" + VERSION;
 
@@ -15,8 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainButton = document.getElementById("main-button") as HTMLButtonElement;
   mainButton.addEventListener("click", handleButtonClick);
 });
-
-fetch("https://count.cab/hit/kqbHURtd0E", { method: "POST" });
 
 // PWA
 registerServiceWorker();
