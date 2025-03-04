@@ -80,11 +80,24 @@ async function handleBluetoothError(error: unknown) {
 
 async function handleRxdNotifications(event: Event) {
   const value = (event.target! as BluetoothRemoteGATTCharacteristic).value!;
-  const dType = value.getUint8(3);
 
   log("RXD: " + bufferToHexString(value.buffer));
 
   try {
+    let payload = new Uint8Array(value.buffer);
+
+    if (payload[0] !== 0xfd) {
+      throw new Error("WATERCTL INTERNAL Unknown RXD data");
+    }
+
+    // sometimes, the first byte is missing maybe due to bad firmware implementation
+    // explanation: [0xFD, 0x09, ...] => [0xFD, 0xFD, 0x09, ...]
+    if (payload[1] === 0x09) {
+      payload = new Uint8Array([0xfd, ...payload]);
+    }
+
+    const dType = payload[3];
+
     // https://github.com/prettier/prettier/issues/5158
     // prettier-ignore
     switch (dType) {
@@ -97,10 +110,10 @@ async function handleRxdNotifications(event: Event) {
         break;
       case 0xAE: // receiving an unlock request (AE), this is a new firmware
         clearTimeout(pendingStartEpilogue);
-        await txdCharacteristic.writeValue(await makeUnlockResponse(value.buffer, bluetoothDevice.name!));
+        await txdCharacteristic.writeValue(await makeUnlockResponse(payload, bluetoothDevice.name!));
         break;
       case 0xAF:
-        switch (value.getUint8(5)) {
+        switch (payload[5]) {
           case 0x55: // key authentication ok; continue to send start epilogue (B2)
             await txdCharacteristic.writeValue(makeStartEpilogue(bluetoothDevice.name!, true));
             break;
