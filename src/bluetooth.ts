@@ -126,6 +126,7 @@ async function handleRxdNotifications(event: Event) {
       case 0xAA: // telemetry, no need to respond
       case 0xB5: // temperature settings related, no need to respond
       case 0xB8: // unknown, no need to respond
+      case 0x53: // due to a bug in the firmware, it may send an AT command "AT+STAS?" via RXD; it doesn't start with FDFD09 and we catch "S" here
         break;
       case 0xBA: // user info upload request; send BA ack to tell it we have done that (won't actually do it)
         await txdCharacteristic.writeValue(baAck);
