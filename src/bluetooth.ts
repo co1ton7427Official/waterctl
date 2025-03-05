@@ -86,14 +86,29 @@ async function handleRxdNotifications(event: Event) {
   try {
     let payload = new Uint8Array(value.buffer);
 
-    if (payload[0] !== 0xfd) {
+    // due to a bug in the firmware, it may send an AT command "AT+STAS?" via RXD; it doesn't start with FDFD09
+    if (payload[0] === 0x41 && payload[1] === 0x54 && payload[2] === 0x2b) {
+      return;
+    }
+
+    if (payload[0] !== 0xfd && payload[0] !== 0x09) {
       throw new Error("WATERCTL INTERNAL Unknown RXD data");
     }
 
-    // sometimes, the first byte is missing maybe due to bad firmware implementation
+    // sometimes, the first one or two bytes are missing maybe due to bad firmware implementation
     // explanation: [0xFD, 0x09, ...] => [0xFD, 0xFD, 0x09, ...]
     if (payload[1] === 0x09) {
       payload = new Uint8Array([0xfd, ...payload]);
+    }
+
+    // explanation: [0x09, ...] => [0xFD, 0xFD, 0x09, ...]
+    if (payload[0] === 0x09) {
+      payload = new Uint8Array([0xfd, 0xfd, ...payload]);
+    }
+
+    // ... and sometimes it sends a single byte 0xFD
+    if (payload.length < 4) {
+      return;
     }
 
     const dType = payload[3];
@@ -139,7 +154,6 @@ async function handleRxdNotifications(event: Event) {
       case 0xAA: // telemetry, no need to respond
       case 0xB5: // temperature settings related, no need to respond
       case 0xB8: // unknown, no need to respond
-      case 0x53: // due to a bug in the firmware, it may send an AT command "AT+STAS?" via RXD; it doesn't start with FDFD09 and we catch "S" here
         break;
       case 0xBA: // user info upload request; send BA ack to tell it we have done that (won't actually do it)
         await txdCharacteristic.writeValue(baAck);
