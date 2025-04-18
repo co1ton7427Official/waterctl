@@ -11,12 +11,6 @@ export function decAsHex(n: number): number {
   return n <= 0 ? 0 : n % 10 | (decAsHex((n / 10) | 0) << 4);
 }
 
-export function isMobileDevice() {
-  // we confirmed that windows phone support is impossible
-  const userAgent = navigator.userAgent.toLowerCase();
-  return /android|iphone|ipod|ipad/i.test(userAgent);
-}
-
 // だって思考と錯誤のモンスター
 // それ僕のこと？ いや皆のこと！
 // 一緒になって踊ろうよ、さ！
