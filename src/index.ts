@@ -6,7 +6,7 @@ import { registerServiceWorker, resizeWindow, setupInstallButton } from "./pwaHe
 import * as Sentry from "@sentry/browser";
 
 Sentry.init({
-  dsn: "https://d07163d14d3078ebd0f9479584e00ced@o4508910681325568.ingest.de.sentry.io/4508910684143696",
+  dsn: "https://17d03841e2244d53abdbe587434efd5c@glitchtip.celeswuff.science/1",
 });
 
 (document.getElementById("version") as HTMLSpanElement).innerText = " · v" + VERSION;
