@@ -11,6 +11,12 @@ export function decAsHex(n: number): number {
   return n <= 0 ? 0 : n % 10 | (decAsHex((n / 10) | 0) << 4);
 }
 
+export function isCsdn() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  const referer = document.referrer.toLowerCase();
+  return /csdnapp/i.test(userAgent) || /csdn.net/i.test(referer) || /gitcode.com/i.test(referer);
+}
+
 // だって思考と錯誤のモンスター
 // それ僕のこと？ いや皆のこと！
 // 一緒になって踊ろうよ、さ！
