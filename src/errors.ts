@@ -58,7 +58,7 @@ const errorCases: ErrorCase[] = [
   {
     isHit: (msg) => !!msg.match(/NetworkError|GATT operation failed|GATT Error Unknown/),
     output: (container) => {
-      container.innerText = "连接不稳定，无法与水控器建立连接。\n请重试。";
+      container.innerText = "连接不稳定，与水控器通信失败。\n请重试。";
     },
     isFatal: true,
     showLogs: false,
