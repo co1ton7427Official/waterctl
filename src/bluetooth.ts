@@ -4,6 +4,12 @@ import { endEpilogue, baAck, offlinebombFix, startPrologue, endPrologue } from "
 import { makeStartEpilogue, makeUnlockResponse } from "./solvers";
 import { bufferToHexString } from "./utils";
 
+export const bluetoothServiceCandidates = [0xf1f0, 0xf0f0, 0xfff0];
+export const bluetoothCharacteristicCandidates = {
+  txd: [0xf1f1, 0xf0f1, 0xfff1],
+  rxd: [0xf1f2, 0xf0f2, 0xfff2],
+};
+
 let bluetoothDevice: BluetoothDevice;
 let txdCharacteristic: BluetoothRemoteGATTCharacteristic;
 let rxdCharacteristic: BluetoothRemoteGATTCharacteristic;
@@ -179,20 +185,51 @@ function setupTimeoutMessage() {
   }
 }
 
+async function getPrimaryService(server: BluetoothRemoteGATTServer) {
+  for (const candidate of bluetoothServiceCandidates) {
+    try {
+      return await server.getPrimaryService(candidate);
+    } catch (error) {
+      if (!error || !String(error).includes("not found") && !String(error).includes("No Services matching UUID")) {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error("No Services matching UUID");
+}
+
+async function getCharacteristic(service: BluetoothRemoteGATTService, candidates: number[]) {
+  for (const candidate of candidates) {
+    try {
+      return await service.getCharacteristic(candidate);
+    } catch (error) {
+      if (!error || !String(error).includes("not found") && !String(error).includes("No Characteristics matching UUID")) {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error("No Characteristics matching UUID");
+}
+
 async function start() {
   try {
     bluetoothDevice = await navigator.bluetooth.requestDevice({
       // https://github.com/WebBluetoothCG/web-bluetooth/issues/234
       filters: Array.from("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ").map((c) => ({ namePrefix: c })),
-      optionalServices: [window.navigator.userAgent.match(/Bluefy/) ? "generic_access" : 0xf1f0], // workaround for Bluefy
+      optionalServices: [
+        ...(window.navigator.userAgent.match(/Bluefy/) ? ["generic_access"] : []),
+        ...bluetoothServiceCandidates,
+      ], // workaround for Bluefy and support KaiLu/BLE variants
     });
 
     updateUi("pending");
 
     const server = await bluetoothDevice.gatt!.connect();
-    const service = await server.getPrimaryService(0xf1f0);
-    txdCharacteristic = await service.getCharacteristic(0xf1f1);
-    rxdCharacteristic = await service.getCharacteristic(0xf1f2);
+    const service = await getPrimaryService(server);
+    txdCharacteristic = await getCharacteristic(service, bluetoothCharacteristicCandidates.txd);
+    rxdCharacteristic = await getCharacteristic(service, bluetoothCharacteristicCandidates.rxd);
 
     await rxdCharacteristic.startNotifications();
     rxdCharacteristic.addEventListener("characteristicvaluechanged", handleRxdNotifications);

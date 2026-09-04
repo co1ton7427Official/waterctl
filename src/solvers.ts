@@ -1,24 +1,18 @@
 import { crc16cgaeaf, crc16changgong } from "./algorithms";
 import { decAsHex } from "./utils";
-import deputy from "./deputy.wasm?init";
 
-// Vitest + WASM is a PITA: using the dynamic imports below is a workaround to get Vitest to work, but will make prod builds bigger
-// Comment the line above and uncomment the lines below when you need to run Vitest
-// A workaround for workaround!
-// See also: https://github.com/vitest-dev/vitest/discussions/4283
+// Vitest + WASM is a PITA: use a small browser-vs-Node branch so the same code works in both the app and tests.
+const deputy: () => Promise<WebAssembly.Instance> = async () => {
+  if (typeof window === "undefined" || import.meta.env.SSR) {
+    const fs = await import("node:fs");
+    const wasmBuffer = fs.readFileSync(new URL("./deputy.wasm", import.meta.url));
+    const wasmModule = new WebAssembly.Module(wasmBuffer);
+    return await WebAssembly.instantiate(wasmModule);
+  }
 
-// const deputy: () => Promise<WebAssembly.Instance> = async () => {
-//   if (import.meta.env.SSR) {
-//     const fs = await import("node:fs");
-//       const wasmBuffer = fs.readFileSync(new URL("./deputy.wasm", import.meta.url));
-//       const wasmModule = new WebAssembly.Module(wasmBuffer);
-//       const instance = await WebAssembly.instantiate(wasmModule);
-//       return instance;
-//   } else {
-//     const module = await import("./deputy.wasm?init")
-//     return await module.default();
-//   }
-// }
+  const module = await import("./deputy.wasm?init");
+  return await module.default();
+};
 
 function makeRandomUserId(): Uint8Array {
   // explanation: XYZW (decimal) => [0xXY, 0xZW]

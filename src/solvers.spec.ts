@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import { makeUnlockResponse, makeStartEpilogue, makeStartEpilogueOfflinebomb } from "./solvers";
 import { bufferToHexString } from "./utils";
 import { crc16changgong } from "./algorithms";
+import { bluetoothServiceCandidates } from "./bluetooth";
 
 const deviceName = "Water33982";
 
@@ -64,6 +65,12 @@ test("makeUnlockResponse", async () => {
       deviceName,
     ),
   ).toEqual(new Uint8Array([0xfe, 0xfe, 0x09, 0xaf, 0x4b, 0x00, 0x02, 0x00, 0xcc, 0xca, 0x9a, 0x20, 0xfe, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+});
+
+test("bluetooth service candidates include KaiLu devices", () => {
+  expect(bluetoothServiceCandidates).toContain(0xf1f0);
+  expect(bluetoothServiceCandidates).toContain(0xfff0);
+  expect(bluetoothServiceCandidates).toContain(0xf0f0);
 });
 
 test("makeStartEpilogue Old Firmware", () => {
